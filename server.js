@@ -1,4 +1,10 @@
-require("dotenv").config();
+const dotenv = require("dotenv");
+const dotenvExpand = require("dotenv-expand");
+
+// Load and expand environment variables
+const myEnv = dotenv.config();
+dotenvExpand.expand(myEnv);
+
 require("module-alias/register");
 
 const mongoose = require("mongoose");
