@@ -12,43 +12,58 @@ const {
   sendSoftwareServiceHealthSuccess,
 } = require("@/responses/internals/common.response");
 const { INTERNAL_ROUTES } = require("@configs/uri.config");
-const { authServiceMiddleware, softwareManagementServiceMiddleware } = require("@/middlewares/internals/verify-service-name.middleware");
+const { microserviceConfig } = require("@configs/microservice.config");
+const { authInternalMiddlewares, softwareManagementInternalMiddlewares } = require("./middleware.gateway.routes");
 const { CREATE_SUPER_ADMIN, PROVIDE_HEALTH_CHECK_TO_AUTH_SERVICE, PROVIDE_HEALTH_CHECK_TO_SOFTWARE_SERVICE } = INTERNAL_ROUTES;
 const internalRouter = express.Router();
 
-// ==================== Bootstrap Routes ====================
+// Check if microservice mode is enabled
+if (!microserviceConfig.enabled) {
+  console.log('ℹ️  Internal routes disabled (monolithic mode)');
+  module.exports = { internalRouter };
+} else {
+  // Load internal modules only in microservice mode
+  const internal = require('../internals');
 
-/**
- * @route   POST /internal/bootstrap/create-super-admin
- * @desc    Create initial super admin account (Bootstrap)
- * @access  Internal (System Bootstrap - No authentication required for first run)
- * @note    This endpoint should be called once during system initialization
- */
-internalRouter.post(CREATE_SUPER_ADMIN,
-  [authServiceMiddleware],
-  createSuperAdminController
-);
+  if (!internal) {
+    console.error('❌ Internal module not available');
+    module.exports = { internalRouter };
+  } else {
+    // ==================== Bootstrap Routes ====================
 
-// ==================== Health Check Routes (Service-Specific) ====================
+    /**
+     * @route   POST /internal/bootstrap/create-super-admin
+     * @desc    Create initial super admin account (Bootstrap)
+     * @access  Internal (System Bootstrap - No authentication required for first run)
+     * @note    This endpoint should be called once during system initialization
+     */
+    internalRouter.post(CREATE_SUPER_ADMIN,
+      [authInternalMiddlewares],
+      createSuperAdminController
+    );
 
-/**
- * @route   GET /internal/auth/health
- * @desc    Health check for auth service
- * @access  Internal (auth-service ONLY)
- */
-internalRouter.get(PROVIDE_HEALTH_CHECK_TO_AUTH_SERVICE, authServiceMiddleware, (req, res) => {
-  return sendAuthServiceHealthSuccess(res, req.serviceAuth);
-});
+    // ==================== Health Check Routes (Service-Specific) ====================
 
-/**
- * @route   GET /internal/software/health
- * @desc    Health check for software management service
- * @access  Internal (software-management-service ONLY)
- */
-internalRouter.get(PROVIDE_HEALTH_CHECK_TO_SOFTWARE_SERVICE, softwareManagementServiceMiddleware, (req, res) => {
-  return sendSoftwareServiceHealthSuccess(res, req.serviceAuth);
-});
+    /**
+     * @route   GET /internal/auth/health
+     * @desc    Health check for auth service
+     * @access  Internal (auth-service ONLY)
+     */
+    internalRouter.get(PROVIDE_HEALTH_CHECK_TO_AUTH_SERVICE, authInternalMiddlewares, (req, res) => {
+      return sendAuthServiceHealthSuccess(res, req.serviceAuth);
+    });
 
-module.exports = {
-  internalRouter
+    /**
+     * @route   GET /internal/software/health
+     * @desc    Health check for software management service
+     * @access  Internal (software-management-service ONLY)
+     */
+    internalRouter.get(PROVIDE_HEALTH_CHECK_TO_SOFTWARE_SERVICE, softwareManagementInternalMiddlewares, (req, res) => {
+      return sendSoftwareServiceHealthSuccess(res, req.serviceAuth);
+    });
+
+    module.exports = {
+      internalRouter
+    }
+  }
 }

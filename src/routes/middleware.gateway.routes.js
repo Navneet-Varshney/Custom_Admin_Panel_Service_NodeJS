@@ -1,7 +1,7 @@
 const { 
     authServiceMiddleware,
     softwareManagementServiceMiddleware 
-} = require("@middlewares/factory/verify-service.middleware-factory");
+} = require("@middlewares/internals/verify-service-name.middleware");
 const { commonMiddlewares } = require("@middlewares/common/index");
 
 const baseMiddlewares = [
