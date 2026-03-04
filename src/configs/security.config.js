@@ -28,12 +28,20 @@ module.exports = {
     encoding: "hex",
     secret: getMyEnv('VERIFICATION_LINK_SECRET', 'default-secret-change-in-production')
   },
+  service: {
+    Custom_Auth_Service_Name: getMyEnv('CUSTOM_AUTH_SERVICE_NAME', 'Custom_Auth_Service'),
+    Software_Management_Service_Name: getMyEnv('SOFTWARE_MANAGEMENT_SERVICE_NAME', 'Software_Management_Service'),
+    Admin_Panel_Service_Name: getMyEnv('ADMIN_PANEL_SERVICE_NAME', 'Admin_Panel_Service'),
+    // Service-to-Service Authentication
+    CUSTOM_AUTH_SERVICE_TOKEN_SECRET: getMyEnv('CUSTOM_AUTH_SERVICE_TOKEN_SECRET', 'change-this-secret-in-production-and-keep-same-across-services'),
+    SOFTWARE_MANAGEMENT_SERVICE_TOKEN_SECRET: getMyEnv('SOFTWARE_MANAGEMENT_SERVICE_TOKEN_SECRET', 'change-this-secret-in-production-and-keep-same-across-services'),
+    ADMIN_PANEL_SERVICE_TOKEN_SECRET: getMyEnv('ADMIN_PANEL_SERVICE_TOKEN_SECRET', 'change-this-secret-in-production-and-keep-same-across-services'),
+    SERVICE_TOKEN_EXPIRY: getMyEnv('SERVICE_TOKEN_EXPIRY', '1h'),
+
+    ALLOWED_SERVICE_NAMES: getMyEnvAsArray('ALLOWED_SERVICE_NAMES', []),
+    algorithms: ["HS256"]
+  },
   ADMIN_SUSPENSION_ALLOWED: getMyEnvAsBool('ADMIN_SUSPENSION_ALLOWED', true),
   ADMIN_BLOCKING_ALLOWED: getMyEnvAsBool('ADMIN_BLOCKING_ALLOWED', true),
   ADVANCED_LOGGING_ENABLED: getMyEnvAsBool('ADVANCED_LOGGING_ENABLED', false),
-  
-  // Service-to-Service Authentication
-  SERVICE_TOKEN_SECRET: getMyEnv('SERVICE_TOKEN_SECRET', 'change-this-secret-in-production-and-keep-same-across-services'),
-  SERVICE_TOKEN_EXPIRY: getMyEnv('SERVICE_TOKEN_EXPIRY', '60m'),
-  ALLOWED_SERVICE_NAMES: getMyEnvAsArray('ALLOWED_SERVICE_NAMES', [])
 };

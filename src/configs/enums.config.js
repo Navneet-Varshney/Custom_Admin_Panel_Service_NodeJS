@@ -1,5 +1,7 @@
 // configs/enums.config.js
 
+const { service } = require("./security.config");
+
 const AuthModes = Object.freeze({
     EMAIL: "EMAIL",
     PHONE: "PHONE",
@@ -84,9 +86,9 @@ const PerformedOnTypes = Object.freeze({
 });
 
 const ServiceNames = Object.freeze({
-    AUTH_SERVICE: "auth-service",
-    ADMIN_PANEL_SERVICE: "admin-panel-service",
-    SOFTWARE_MANAGEMENT_SERVICE: "software-management-service"
+    AUTH_SERVICE: service.Custom_Auth_Service_Name,
+    ADMIN_PANEL_SERVICE: service.Admin_Panel_Service_Name,
+    SOFTWARE_MANAGEMENT_SERVICE: service.Software_Management_Service_Name
 });
 
 const Status = Object.freeze({

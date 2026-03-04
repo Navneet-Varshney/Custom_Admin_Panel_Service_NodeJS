@@ -5,6 +5,7 @@ const DB_COLLECTIONS = {
     ADMINS: "admins",
     USERS: "users",
     REQUESTS: "requests",
+    SERVICE_TRACKER: "service_trackers",
     
     // 🔄 New: Unified requests collection (all request types via discriminators)
     ADMIN_REQUESTS: "admin_requests",

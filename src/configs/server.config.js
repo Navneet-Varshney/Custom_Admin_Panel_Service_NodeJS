@@ -4,5 +4,5 @@ const { getMyEnvAsNumber } = require("@/utils/env.util");
 module.exports = {
     // Port Number provided by env files are always in String Format
     // Most libraries like Express.js expect the port as a number when passed to app.listen()
-    PORT_NUMBER: getMyEnvAsNumber("PORT_NUMBER", 3000)
+    PORT_NUMBER: getMyEnvAsNumber("PORT_NUMBER", 8081)
 }
