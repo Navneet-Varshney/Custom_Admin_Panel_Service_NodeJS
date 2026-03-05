@@ -178,61 +178,47 @@ const adminSchema = new mongoose.Schema({
 
 /* 🔐 Centralized Validation Hook */
 
-adminSchema.pre("validate", function (next) {
+adminSchema.pre("validate", function () {
 
     if (!this.isNew && this.isModified("isActive") && this.isActive) {
         if (!this.activatedBy || !this.lastActivatedReason) {
-            return next(
-                new Error(
-                    "Activation must include activatedBy and lastActivatedReason."
-                )
+            throw new Error(
+                "Activation must include activatedBy and lastActivatedReason."
             );
         }
     }
 
     if (!this.isSuspended && this.isModified("isSuspended")) {
         if (!this.unsuspendedBy || !this.lastUnsuspensionReason) {
-            return next(
-                new Error("Unsuspension must include unsuspendedBy and lastUnsuspensionReason.")
-            );
+            throw new Error("Unsuspension must include unsuspendedBy and lastUnsuspensionReason.");
         }
     }
 
     if (!this.isBlocked && this.isModified("isBlocked")) {
         if (!this.unblockedBy || !this.lastUnblockReason) {
-            return next(
-                new Error("Unblock must include unblockedBy and lastUnblockReason.")
-            );
+            throw new Error("Unblock must include unblockedBy and lastUnblockReason.");
         }
     }
 
     if (!this.isActive  && this.isModified("isActive")) {
         if (!this.deactivatedBy || !this.lastDeactivatedReason) {
-            return next(
-                new Error("Deactivated admins must include deactivatedBy and lastDeactivatedReason.")
-            );
+            throw new Error("Deactivated admins must include deactivatedBy and lastDeactivatedReason.");
         }
     }
 
     if (this.isSuspended && this.isBlocked) {
-        return next(
-            new Error("Admin cannot be both suspended and blocked simultaneously.")
-        );
+        throw new Error("Admin cannot be both suspended and blocked simultaneously.");
     }
 
     if (this.isSuspended) {
         if (!this.lastSuspensionReason || !this.suspendedBy) {
-            return next(
-                new Error("Suspended admins must have lastSuspensionReason and suspendedBy.")
-            );
+            throw new Error("Suspended admins must have lastSuspensionReason and suspendedBy.");
         }
     }
 
     if (this.isBlocked) {
         if (!this.lastBlockReason || !this.blockedBy) {
-            return next(
-                new Error("Blocked admins must have lastBlockReason and blockedBy.")
-            );
+            throw new Error("Blocked admins must have lastBlockReason and blockedBy.");
         }
     }
 
@@ -261,9 +247,7 @@ adminSchema.pre("validate", function (next) {
 
     if (this.adminType !== AdminTypes.SUPER_ADMIN) {
         if (!this.supervisorId) {
-            return next(
-                new Error(`supervisorId is required for ${this.adminType} admins.`)
-            );
+            throw new Error(`supervisorId is required for ${this.adminType} admins.`);
         }
     }
 
@@ -271,24 +255,18 @@ adminSchema.pre("validate", function (next) {
 
     if (this.adminType === AdminTypes.SUPER_ADMIN) {
         if (this.createdBy !== null && this.createdBy !== "SYSTEM") {
-            return next(
-                new Error("SUPER_ADMIN must have createdBy as null or 'SYSTEM'.")
-            );
+            throw new Error("SUPER_ADMIN must have createdBy as null or 'SYSTEM'.");
         }
     } else {
         if (!this.createdBy) {
-            return next(
-                new Error(`${this.adminType} must have a valid createdBy adminId.`)
-            );
+            throw new Error(`${this.adminType} must have a valid createdBy adminId.`);
         }
     }
-
-    next();
 });
 
 /* ---------- Suspension / Block Counters ---------- */
 
-adminSchema.pre("save", function (next) {
+adminSchema.pre("save", function () {
 
     if (this.isModified("isSuspended") && this.isSuspended) {
         this.suspensionCount += 1;
@@ -319,8 +297,6 @@ adminSchema.pre("save", function (next) {
     ) {
         this.unblockedAt = new Date();
     }
-
-    next();
 });
 
 module.exports = {

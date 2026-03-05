@@ -31,7 +31,7 @@ const createSuperAdminController = async (req, res) => {
     try {
         // Extract data from request body
         const { adminId, firstName } = req.body;
-
+        
         // Call service
         const result = await createSuperAdmin({ adminId, firstName });
 
