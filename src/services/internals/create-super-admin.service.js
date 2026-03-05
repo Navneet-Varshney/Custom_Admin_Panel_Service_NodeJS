@@ -14,7 +14,7 @@ const createSuperAdmin = async ({ adminId, firstName }) => {
   try {
 
     // 1️⃣ Validate input
-    if (!adminId || !firstName) {
+    if (!adminId) {
       logFailure(
         SERVICE_NAMES.ADMIN_PANEL_SERVICE,
         SYSTEM_LOG_EVENTS.BOOTSTRAP_SUPER_ADMIN,
@@ -61,7 +61,7 @@ const createSuperAdmin = async ({ adminId, firstName }) => {
       adminId,
       firstName,
       adminType: AdminTypes.SUPER_ADMIN,
-      createdBy: "SYSTEM",
+      createdBy: null,
       isActive: true
     });
 
