@@ -21,6 +21,19 @@ module.exports = {
   },
 
   perUserAndDevice: {
-
+      createAdmin: {
+        maxRequests: 50,
+        windowMs: 60 * 60 * 1000, // 1 hour
+        prefix: "create_admin",
+        reason: "Excessive admin creation attempts",
+        message: "You have exceeded the maximum number of admin creation attempts. Please try again later."
+      },
+      createClient: {
+        maxRequests: 100,
+        windowMs: 60 * 60 * 1000, // 1 hour
+        prefix: "create_client",
+        reason: "Excessive client creation attempts",
+        message: "You have exceeded the maximum number of client creation attempts. Please try again later."
+      }
   }
 };

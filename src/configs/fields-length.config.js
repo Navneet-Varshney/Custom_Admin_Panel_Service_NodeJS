@@ -44,5 +44,9 @@ module.exports = {
   orgNameLength: {
     min: 2,
     max: 200
+  },
+  passwordLength: {
+    min: 8,
+    max: 64
   }
 };
