@@ -8,8 +8,13 @@ const {
   DeviceTypes,
   AuditMode,
   FirstNameFieldSetting,
-  ContactModes
+  ContactModes,
+  AdminTypes,
+  AdminRoleTypes,
+  ClientRoleTypes
 } = require("@configs/enums.config");
+
+const { AdminCreationReasons, ClientCreationReasons } = require("@configs/reasons.config");
 
 /**
  * Factory to create enum helper with boolean returns
@@ -44,6 +49,11 @@ const AuthModesHelper = createEnumHelper(AuthModes, "AuthModes");
 const AuditModeHelper = createEnumHelper(AuditMode, "AuditMode");
 const FirstNameFieldSettingHelper = createEnumHelper(FirstNameFieldSetting, "FirstNameFieldSetting");
 const ContactModesHelper = createEnumHelper(ContactModes, "ContactModes");
+const AdminTypesHelper = createEnumHelper(AdminTypes, "AdminTypes");
+const AdminRoleTypesHelper = createEnumHelper(AdminRoleTypes, "AdminRoleTypes");
+const ClientRoleTypesHelper = createEnumHelper(ClientRoleTypes, "ClientRoleTypes");
+const AdminCreationReasonsHelper = createEnumHelper(AdminCreationReasons, "AdminCreationReasons");
+const ClientCreationReasonsHelper = createEnumHelper(ClientCreationReasons, "ClientCreationReasons");
 
 module.exports = {
     DeviceTypeHelper,
@@ -51,5 +61,10 @@ module.exports = {
     AuthModesHelper,
     AuditModeHelper,
     FirstNameFieldSettingHelper,
-    ContactModesHelper
+    ContactModesHelper,
+    AdminTypesHelper,
+    AdminRoleTypesHelper,
+    ClientRoleTypesHelper,
+    AdminCreationReasonsHelper,
+    ClientCreationReasonsHelper
 };
