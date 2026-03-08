@@ -22,6 +22,7 @@ module.exports = {
     ADMIN_ROUTES: {
         CREATE_ADMIN: `/create-admin`, // /admin-panel-service/api/v1/admins/create-admin
         CREATE_USER: `/create-user`, // /admin-panel-service/api/v1/admins/create-user
+        CONVERT_USER_TO_CLIENT: `/convert-user-to-client`, // /admin-panel-service/api/v1/admins/convert-user-to-client
         GET_ADMIN: `/get-admin`, // /admin-panel-service/api/v1/admins/get-admin
         UPDATE_ADMIN: `/update-admin`, // /admin-panel-service/api/v1/admins/update-admin
         DELETE_ADMIN: `/delete-admin` // /admin-panel-service/api/v1/admins/delete-admin

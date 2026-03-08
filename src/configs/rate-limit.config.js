@@ -34,6 +34,13 @@ module.exports = {
         prefix: "create_client",
         reason: "Excessive client creation attempts",
         message: "You have exceeded the maximum number of client creation attempts. Please try again later."
+      },
+      convertUserToClient: {
+        maxRequests: 50,
+        windowMs: 60 * 60 * 1000, // 1 hour
+        prefix: "convert_user_to_client",
+        reason: "Excessive user conversion attempts",
+        message: "You have exceeded the maximum number of user conversion attempts. Please try again later."
       }
   }
 };

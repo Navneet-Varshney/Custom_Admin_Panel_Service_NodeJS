@@ -1,13 +1,15 @@
 const {
     strongPasswordRegex,
     phoneNumberRegex,
-    emailRegex
+    emailRegex,
+    customIdRegex
 } = require("./regex.config");
 
 const {
     passwordLength,
     phoneNumberLength,
-    emailLength
+    emailLength,
+    customIdLength
 } = require("./fields-length.config");
 
 const {
@@ -15,7 +17,8 @@ const {
     AdminRoleTypesHelper,
     ClientRoleTypesHelper,
     AdminCreationReasonsHelper,
-    ClientCreationReasonsHelper
+    ClientCreationReasonsHelper,
+    ConvertUserToClientReasonsHelper
 } = require("@utils/enum-validators.util");
 
 const validationRules = {
@@ -45,6 +48,13 @@ const validationRules = {
     },
     clientCreationReason: {
         enum: ClientCreationReasonsHelper
+    },
+    convertReason: {
+        enum: ConvertUserToClientReasonsHelper
+    },
+    userId: {
+        length: customIdLength,
+        regex: customIdRegex
     }
 };
 

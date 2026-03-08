@@ -11,14 +11,17 @@
  * → Changes will automatically reflect here
  */
 
-const { FieldDefinitions, getRequiredFields } = require("./field-definitions.config");
+const { getRequiredFields } = require("@/utils/field-definition.util");
+const { FieldDefinitions } = require("./field-definitions.config");
 
 // AUTO-GENERATED REQUIRED FIELDS
 
 const createAdminField = getRequiredFields(FieldDefinitions.CREATE_ADMIN);
 const createUserField = getRequiredFields(FieldDefinitions.CREATE_USER);
+const convertUserToClientField = getRequiredFields(FieldDefinitions.CONVERT_USER_TO_CLIENT);
 
 module.exports = {
     createAdminField,
-    createUserField
+    createUserField,
+    convertUserToClientField
 };

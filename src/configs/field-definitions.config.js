@@ -73,53 +73,30 @@ const FieldDefinitions = {
             validation: validationRules.clientRole,
             description: "Role of the new client account (for software management)"
         }
+    },
+    CONVERT_USER_TO_CLIENT: {
+        USER_ID: {
+            field: "userId",
+            required: true,
+            validation: validationRules.userId,
+            description: "ID of the user to be converted to client"
+        },
+        CONVERT_REASON: {
+            field: "convertReason",
+            required: true,
+            validation: validationRules.convertReason,
+            description: "Reason for converting user to client"
+        },
+        ROLE: {
+            field: "role",
+            required: true,
+            validation: validationRules.clientRole,
+            description: "Role for the client in software management service"
+        }
     }
     // Future endpoints can be added here following the same structure
 };
 
-// HELPER: Get Required Fields Array
-
-/**
- * Extracts required field names from a definition object
- * @param {Object} definition - Field definition object (e.g., FieldDefinitions.SIGN_UP)
- * @returns {Array<string>} - Array of required field names
- * 
- * Example:
- * getRequiredFields(FieldDefinitions.CHANGE_PASSWORD) 
- * => ['password', 'newPassword', 'confirmPassword']
- */
-
-const getRequiredFields = (definition) => {
-  return Object.values(definition)
-    .filter(fieldMeta => fieldMeta.required)
-    .map(fieldMeta => fieldMeta.field);
-};
-
-// HELPER: Get Validation Set
-
-/**
- * Extracts validation rules mapped to field names
- * @param {Object} definition - Field definition object
- * @returns {Object} - Validation set { fieldName: validationRule }
- * 
- * Example:
- * getValidationSet(FieldDefinitions.VERIFY_PHONE)
- * => { phone: validationRules.phone }
- */
-
-const getValidationSet = (definition) => {
-  return Object.values(definition).reduce((acc, fieldMeta) => {
-    if (fieldMeta.validation) {
-      acc[fieldMeta.field] = fieldMeta.validation;
-    }
-    return acc;
-  }, {});
-};
-
-// EXPORTS
-
 module.exports = {
-  FieldDefinitions,
-  getRequiredFields,
-  getValidationSet
+  FieldDefinitions
 };

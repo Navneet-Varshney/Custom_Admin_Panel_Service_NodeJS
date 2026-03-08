@@ -29,7 +29,7 @@ module.exports = {
     min: 0,
     max: 500
   },
-  adminIdLength: {
+  customIdLength: {
     min: 10, 
     max: 10
   }

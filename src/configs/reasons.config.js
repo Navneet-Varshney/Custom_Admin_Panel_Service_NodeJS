@@ -202,6 +202,16 @@ const ClientCreationReasons = Object.freeze({
   OTHER: "other"
 });
 
+const ConvertUserToClientReasons = Object.freeze({
+  USER_UPGRADE_REQUEST: "user_upgrade_request",
+  ADMIN_DECISION: "admin_decision",
+  BUSINESS_EXPANSION: "business_expansion",
+  SERVICE_TIER_CHANGE: "service_tier_change",
+  SPECIAL_ARRANGEMENT: "special_arrangement",
+  MIGRATION: "migration",
+  OTHER: "other"
+});
+
 const ClientRevertReasons = Object.freeze({
   CLIENT_REQUEST: "client_request",
   POLICY_VIOLATION: "policy_violation",
@@ -294,6 +304,7 @@ module.exports = {
   SpecialPermissionReasons,
   BlockPermissionReasons,
   ClientCreationReasons,
+  ConvertUserToClientReasons,
   ClientRevertReasons,
   RoleChangeReasons,
   ClientOnboardingRejectionReasons,

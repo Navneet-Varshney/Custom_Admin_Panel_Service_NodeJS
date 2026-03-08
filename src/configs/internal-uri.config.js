@@ -38,6 +38,10 @@ const AUTH_SERVICE_URIS = {
     CREATE_USER: {
         method: requestMethod.POST,
         uri: "/custom-auth-service/api/v1/internal/create-user"
+    },
+    CONVERT_USER_TO_CLIENT: {
+        method: requestMethod.PATCH,
+        uri: "/custom-auth-service/api/v1/internal/convert-user-type/{userId}"
     }
 };
 

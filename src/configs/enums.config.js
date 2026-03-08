@@ -172,6 +172,11 @@ const ClientRoleTypes = Object.freeze({
   OTHER: "other"
 });
 
+const TotalTypes = Object.freeze({
+  ...UserTypes,
+  ADMIN: "ADMIN"
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -196,5 +201,6 @@ module.exports = {
   ClientStatus,
   ClientTypes,
   AdminRoleTypes,
-  ClientRoleTypes
+  ClientRoleTypes,
+  TotalTypes
 };

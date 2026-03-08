@@ -11,13 +11,15 @@
  * → Changes will automatically reflect here
  */
 
-const { FieldDefinitions, getValidationSet } = require("./field-definitions.config");
+const { getValidationSet } = require("@/utils/field-definition.util");
+const { FieldDefinitions } = require("./field-definitions.config");
 
 // AUTO-GENERATED VALIDATION SETS
 
 const validationSets = {
     createAdmin: getValidationSet(FieldDefinitions.CREATE_ADMIN),
-    createUser: getValidationSet(FieldDefinitions.CREATE_USER)
+    createUser: getValidationSet(FieldDefinitions.CREATE_USER),
+    convertUserToClient: getValidationSet(FieldDefinitions.CONVERT_USER_TO_CLIENT)
 };
 
 module.exports = {
