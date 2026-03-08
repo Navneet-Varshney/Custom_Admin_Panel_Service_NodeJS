@@ -4,5 +4,6 @@ const { perUserAndDevice } = require("@configs/rate-limit.config");
 
 module.exports = {
     createAdminRateLimiter: createRateLimiter(perUserAndDevice.createAdmin),
-    createClientRateLimiter: createRateLimiter(perUserAndDevice.createClient)
+    createClientRateLimiter: createRateLimiter(perUserAndDevice.createClient),
+    convertUserToClientRateLimiter: createRateLimiter(perUserAndDevice.convertUserToClient)
 }
