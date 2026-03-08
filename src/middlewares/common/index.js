@@ -9,6 +9,7 @@ const { authValidatorBody, authValidatorQuery, authValidatorParams } = require("
 const { firstNameValidator } = require("./first-name.middleware");
 const { isUserAccountActive } = require("./is-user-account-active.middleware");
 const { isUserAccountBlocked } = require("./is-user-blocked.middleware");
+const { convertUserToClientMiddleware } = require("./validate-type-transition.middleware");
 
 const commonMiddlewares = {
     requestIdMiddleware,
@@ -25,7 +26,8 @@ const commonMiddlewares = {
     authValidatorParams,
     firstNameValidator,
     isUserAccountActive,
-    isUserAccountBlocked
+    isUserAccountBlocked,
+    convertUserToClientMiddleware
 }
 
 module.exports = {

@@ -1,5 +1,5 @@
 const { throwInternalServerError, throwAccessDeniedError } = require("@/responses/common/error-handler.response");
-const { isUserId } = require("@/utils/entity-type.util");
+const { isValidCustomId } = require("@/utils/id-validators.util");
 const { logMiddlewareError } = require("@/utils/log-error.util");
 const { logWithTime } = require("@/utils/time-stamps.util");
 
@@ -8,10 +8,10 @@ const checkUserMiddleware = (req, res, next) => {
 
         const userId = req.body.userId; // This should be injected by the JWT verification middleware
 
-        // Check if userId starts with User prefix
-        if (!isUserId(userId)) {
-            logMiddlewareError("checkUser", `User ID does not have user prefix: ${userId}`, req);
-            return throwAccessDeniedError(res, "User privileges required");
+        // Check if userId has valid format (all IDs now use USR prefix)
+        if (!isValidCustomId(userId)) {
+            logMiddlewareError("checkUser", `Invalid User ID format: ${userId}`, req);
+            return throwAccessDeniedError(res, "Invalid user ID format");
         }
 
         logWithTime(`✅ User ID verified: ${userId}`);

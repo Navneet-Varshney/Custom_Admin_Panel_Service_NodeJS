@@ -21,9 +21,8 @@ const {
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { tokenPayloads } = require("@configs/token.config");
-const { isValidUUID, isValidMongoID } = require("@utils/id-validators.util");
+const { isValidUUID, isValidCustomId } = require("@utils/id-validators.util");
 const { validateObjectShape } = require("@utils/object-shape-validator.util");
-const { isAdminId, isClientId } = require("@/utils/entity-type.util");
 
 /**
  * Validates JWT token payload structure and field formats
@@ -65,7 +64,7 @@ const validateJwtPayloadMiddleware = (req, res, next) => {
       return throwAccessDeniedError(res, "Invalid access token deviceId");
     }
     
-    if (!isAdminId(decodedAccess.uid) && !isClientId(decodedAccess.uid)) {
+    if (!isValidCustomId(decodedAccess.uid)) {
       logWithTime(`❌ [validateJwtPayloadMiddleware] Invalid access token uid format`);
       logMiddlewareError("validateJwtPayloadMiddleware", "Access token uid validation failed", req);
       return throwAccessDeniedError(res, "Invalid access token uid");
@@ -78,7 +77,7 @@ const validateJwtPayloadMiddleware = (req, res, next) => {
       return throwAccessDeniedError(res, "Invalid refresh token deviceId");
     }
 
-    if (!isAdminId(decodedRefresh.uid) && !isClientId(decodedRefresh.uid)) {
+    if (!isValidCustomId(decodedRefresh.uid)) {
       logWithTime(`❌ [validateJwtPayloadMiddleware] Invalid refresh token uid format`);
       logMiddlewareError("validateJwtPayloadMiddleware", "Refresh token uid validation failed", req);
       return throwAccessDeniedError(res, "Invalid refresh token uid");

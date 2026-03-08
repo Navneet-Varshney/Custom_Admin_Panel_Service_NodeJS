@@ -1,5 +1,5 @@
 const { fetchEntityFactory } = require("@middlewares/factory/fetch-entity.middleware-factory");
-const { fetchUser } = require("@/services/common/fetch-user.util");
+const { fetchUser } = require("@/services/common/fetch-user.service");
 
 /**
  * CASE 1: LOGIN / GET DETAILS
@@ -19,5 +19,5 @@ const ensureUserNew = fetchEntityFactory(fetchUser, "User", false);
 
 module.exports = { 
     ensureUserExists, 
-    ensureUserNew 
+    ensureUserNew
 };
