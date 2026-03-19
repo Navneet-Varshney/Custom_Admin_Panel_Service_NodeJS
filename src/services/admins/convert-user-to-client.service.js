@@ -2,6 +2,8 @@ const { UserModel } = require("@models/user.model");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@/services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
+const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
+const { prepareAuditData, cloneForAudit } = require("@/utils/audit-data.util");
 const { AdminErrorTypes, UserTypes, ClientStatus } = require("@configs/enums.config");
 const { createInternalServiceClient } = require("@/utils/internal-service-client.util");
 const { getServiceToken } = require("@/internals/service-token");
@@ -9,6 +11,7 @@ const { AUTH_SERVICE_URIS } = require("@/configs/internal-uri.config");
 const { INTERNAL_API, SERVICE_NAMES } = require("@/internals/constants");
 const { errorMessage } = require("@/utils/log-error.util");
 const { createClientInSoftwareManagementService } = require("./create-client.service");
+const { checkOrgExists } = require("../organizations/check-org-exists.service");
 
 /**
  * Convert User to Client Service
@@ -21,14 +24,26 @@ const { createClientInSoftwareManagementService } = require("./create-client.ser
  * 3. Call Software Management Service to create client record
  * 
  * @param {Object} creator - Admin performing the conversion
- * @param {Object} data - {userId, convertReason, role}
+ * @param {Object} data - {user, convertReason, reasonDescription, role, organizationIds}
  * @param {Object} device - Device info
  * @param {string} requestId - Request tracking ID
  * @returns {Promise<{success: boolean, data?: Object, type?: string, message?: string}>}
  */
-const convertUserToClientService = async (creator, { userId, convertReason, role }, device, requestId) => {
+const convertUserToClientService = async (creator, { user, convertReason, reasonDescription = null, role, organizationIds = [] }, device, requestId) => {
     try {
+
+        const userId = user.userId;
+        
         logWithTime(`🔄 Starting user to client conversion for ${userId}...`);
+
+        const checkOrgIds = await checkOrgExists(organizationIds);
+        if (!checkOrgIds) {
+            return {
+                success: false,
+                type: AdminErrorTypes.INVALID_DATA,
+                message: "One or more organization IDs are invalid"
+            };
+        }
 
         // Step 1: Get service token
         const serviceToken = await getServiceToken(SERVICE_NAMES.ADMIN_PANEL_SERVICE);
@@ -68,7 +83,21 @@ const convertUserToClientService = async (creator, { userId, convertReason, role
 
         // Step 3: Update Admin Panel DB
         logWithTime(`🔄 Updating user record in Admin Panel DB...`);
+
+        // Fetch old user data before conversion for audit
+        const oldUser = await UserModel.findOne({ userId: userId });
         
+        if (!oldUser) {
+            logWithTime(`❌ Failed to find user in Admin Panel DB`);
+            return {
+                success: false,
+                type: AdminErrorTypes.NOT_FOUND,
+                message: "User not found in Admin Panel database"
+            };
+        }
+        
+        const oldUserClone = cloneForAudit(oldUser);
+
         const updateResult = await UserModel.findOneAndUpdate(
             { userId: userId },
             {
@@ -80,25 +109,22 @@ const convertUserToClientService = async (creator, { userId, convertReason, role
                     clientCreationReason: convertReason
                 }
             },
-            { new: true } // Return updated document
+            { returnDocument: 'after' } // Return updated document
         );
-
-        if (!updateResult) {
-            logWithTime(`❌ Failed to update user in Admin Panel DB`);
-            return {
-                success: false,
-                type: AdminErrorTypes.NOT_FOUND,
-                message: "User not found in Admin Panel database"
-            };
-        }
 
         logWithTime(`✅ User updated in Admin Panel DB: ${userId}`);
 
         // Step 4: Create client in Software Management Service (fire and forget)
-        const firstName = updateResult.firstName || null;
-        createClientInSoftwareManagementService(userId, firstName, role, serviceToken);
+        createClientInSoftwareManagementService(
+            updateResult,
+            updateResult.firstName,
+            role,
+            organizationIds
+        );
 
-        // Step 5: Log activity
+        // Step 5: Prepare audit data and log activity
+        const { oldData, newData } = prepareAuditData(oldUserClone, updateResult);
+        
         logActivityTrackerEvent(
             creator,
             device,
@@ -106,20 +132,13 @@ const convertUserToClientService = async (creator, { userId, convertReason, role
             ACTIVITY_TRACKER_EVENTS.CONVERT_USER_TO_CLIENT,
             `Converted user ${userId} to client`,
             {
-                oldData: {
-                    userId: userId,
-                    userType: UserTypes.USER
-                },
-                newData: {
-                    userId: userId,
-                    userType: UserTypes.CLIENT,
-                    clientStatus: ClientStatus.ACTIVE,
-                    convertReason: convertReason,
-                    role: role
-                },
+                oldData,
+                newData,
                 adminActions: {
-                    targetId: userId,
-                    reason: convertReason
+                    targetId: user._id,
+                    reason: convertReason,
+                    reasonDescription: reasonDescription || null,
+                    performedOn: DB_COLLECTIONS.USERS
                 }
             }
         );
