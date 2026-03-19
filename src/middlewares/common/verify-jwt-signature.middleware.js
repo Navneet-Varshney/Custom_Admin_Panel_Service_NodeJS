@@ -99,6 +99,11 @@ const verifyJWTSignatureMiddleware = async (req, res, next) => {
         req.tokenMeta.decodedAccess = verifiedAccessToken;
         
         logWithTime(`✅ Access token refreshed successfully for userId: ${verifiedAccessToken.uid}`);
+
+        req.userId = userId;
+        
+        return next();
+
       } catch (refreshError) {
         logWithTime(`❌ Error during token refresh: ${refreshError.message}`);
         clearAccessTokenHeaders(res);
