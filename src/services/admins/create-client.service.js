@@ -5,12 +5,15 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@/services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { AdminErrorTypes, UserTypes, ClientStatus } = require("@configs/enums.config");
+const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
+const { prepareAuditData } = require("@/utils/audit-data.util");
 // const { notifySupervisorOnAdminCreation } = require("@utils/admin-notifications.util");
 const { createInternalServiceClient } = require("@/utils/internal-service-client.util");
 const { getServiceToken } = require("@/internals/service-token");
 const { AUTH_SERVICE_URIS, SOFTWARE_MANAGEMENT_URIS } = require("@/configs/internal-uri.config");
 const { INTERNAL_API, SERVICE_NAMES } = require("@/internals/constants");
 const { errorMessage } = require("@/utils/log-error.util");
+const { checkOrgExists } = require("../organizations/check-org-exists.service");
 
 /**
  * Create Client Service
@@ -21,8 +24,10 @@ const { errorMessage } = require("@/utils/log-error.util");
  * @returns {Promise<{success: boolean, data?: Object, type?: string, message?: string}>}
  */
 
-const createClientInSoftwareManagementService = async (clientId, firstName, role) => {
+const createClientInSoftwareManagementService = async (client, firstName, role, orgIds = []) => {
     try {
+        const clientId = client.userId; // Use the same ID for consistency across services
+
         // Create Client in Software Management Service
         const serviceToken = await getServiceToken(SERVICE_NAMES.ADMIN_PANEL_SERVICE);
         logWithTime(`🔄 Creating client account in Software Management Service...`);
@@ -42,7 +47,8 @@ const createClientInSoftwareManagementService = async (clientId, firstName, role
                 type: "user",
                 firstName,
                 id,
-                role
+                role,
+                orgIds
             }
         });
 
@@ -59,7 +65,16 @@ const createClientInSoftwareManagementService = async (clientId, firstName, role
 
 const createClientService = async (creatorAdmin, clientData, device, requestId) => {
     try {
-        const { firstName, creationReason, email, password, countryCode, localNumber, phone, role } = clientData;
+        const { firstName, creationReason, reasonDescription = undefined, email, password, countryCode, localNumber, phone, role, orgIds } = clientData;
+
+        const checkOrgIds = await checkOrgExists(orgIds);
+        if (!checkOrgIds) {
+            return {
+                success: false,
+                type: AdminErrorTypes.INVALID_DATA,
+                message: "One or more organization IDs are invalid"
+            };
+        }
 
         // Create Client In Auth Service and get Client Id
         logWithTime(`🔄 Creating client account in Auth Service...`);
@@ -97,7 +112,9 @@ const createClientService = async (creatorAdmin, clientData, device, requestId) 
             };
         }
 
-        const clientId = authResult.data?.data?.userId || authResult.data?.userId;
+        logWithTime(`🔍 Auth Service Full Response: ${JSON.stringify(authResult, null, 2)}`);
+        
+        const clientId = authResult?.data?.data?.userId;
 
         if (!clientId) {
             logWithTime(`❌ Auth Service did not return clientId`);
@@ -132,8 +149,11 @@ const createClientService = async (creatorAdmin, clientData, device, requestId) 
 
         logWithTime(`✅ Client created in DB: ${newClient.userId}`);
 
+        // Prepare audit data (creation: oldData is null)
+        const { oldData, newData } = prepareAuditData(null, newClient);
+
         // Create client in Software Management Service (fire and forget - we don't want to fail the whole process if this fails)
-        createClientInSoftwareManagementService(clientId, firstName, role);
+        createClientInSoftwareManagementService(newClient, firstName, role, orgIds);
 
         // Log activity
         logActivityTrackerEvent(
@@ -143,16 +163,13 @@ const createClientService = async (creatorAdmin, clientData, device, requestId) 
             ACTIVITY_TRACKER_EVENTS.CREATE_CLIENT,
             `Created client ${newClient.userId}`,
             {
-                newData: {
-                    userId: newClient.userId,
-                    userType: newClient.userType,
-                    firstName,
-                    clientStatus: newClient.clientStatus,
-                    clientCreationReason: creationReason
-                },
+                oldData,
+                newData,
                 adminActions: {
-                    targetId: newClient.userId,
-                    reason: creationReason
+                    targetId: newClient._id,
+                    reason: creationReason,
+                    reasonDescription: reasonDescription || undefined,
+                    performedOn: DB_COLLECTIONS.USERS
                 }
             }
         );

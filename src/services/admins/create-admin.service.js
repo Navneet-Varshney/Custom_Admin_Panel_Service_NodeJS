@@ -5,6 +5,8 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@/services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { AdminErrorTypes } = require("@configs/enums.config");
+const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
+const { prepareAuditData } = require("@/utils/audit-data.util");
 // const { notifySupervisorOnAdminCreation } = require("@utils/admin-notifications.util");
 const { createInternalServiceClient } = require("@/utils/internal-service-client.util");
 const { getServiceToken } = require("@/internals/service-token");
@@ -14,7 +16,7 @@ const { INTERNAL_API, SERVICE_NAMES } = require("@/internals/constants");
 /**
  * Create Admin Service
  * @param {Object} creatorAdmin - The admin creating the new admin
- * @param {Object} adminData - Admin data {firstName, adminType, supervisorId, creationReason, email, password, countryCode, localNumber, phone}
+ * @param {Object} adminData - Admin data {firstName, adminType, supervisorId, creationReason, creationDescription, reasonDescription, email, password, countryCode, localNumber, phone}
  * @param {Object} supervisor - Supervisor admin object (if applicable)
  * @param {Object} device - Device object {deviceUUID, deviceType, deviceName}
  * @param {string} requestId - Request ID for tracking
@@ -22,7 +24,7 @@ const { INTERNAL_API, SERVICE_NAMES } = require("@/internals/constants");
  */
 const createAdminService = async (creatorAdmin, adminData, supervisor, device, requestId) => {
     try {
-        const { firstName, adminType, supervisorId, creationReason, email, password, countryCode, localNumber, phone, role } = adminData;
+        const { firstName, adminType, supervisorId, creationReason, reasonDescription, email, password, countryCode, localNumber, phone, role } = adminData;
 
         // Create Admin In Auth Service and get Admin Id
         logWithTime(`🔄 Creating admin account in Auth Service...`);
@@ -115,6 +117,9 @@ const createAdminService = async (creatorAdmin, adminData, supervisor, device, r
 
         logWithTime(`✅ Admin created in DB: ${newAdmin.adminId}`);
 
+        // Prepare audit data (creation: oldData is null)
+        const { oldData, newData } = prepareAuditData(null, newAdmin);
+
         // Log activity
         logActivityTrackerEvent(
             creatorAdmin,
@@ -123,10 +128,13 @@ const createAdminService = async (creatorAdmin, adminData, supervisor, device, r
             ACTIVITY_TRACKER_EVENTS.CREATE_ADMIN,
             `Created admin ${newAdmin.adminId} (${adminType})`,
             { 
-                newData: { adminId: newAdmin.adminId, adminType, firstName, supervisorId },
+                oldData,
+                newData,
                 adminActions: { 
-                    targetId: newAdmin.adminId, 
-                    reason: creationReason 
+                    targetId: newAdmin._id, 
+                    reason: creationReason,
+                    reasonDescription: reasonDescription,
+                    performedOn: DB_COLLECTIONS.ADMINS
                 } 
             }
         );
