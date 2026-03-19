@@ -6,7 +6,8 @@ const {
   throwInternalServerError, 
   getLogIdentifiers, 
   throwConflictError,
-  throwDBResourceNotFoundError 
+  throwDBResourceNotFoundError,
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { createAdminSuccessResponse } = require("@responses/success/index");
 const { AdminErrorTypes } = require("@configs/enums.config");
@@ -15,7 +16,7 @@ const { canActOnRole } = require("@/utils/role.util");
 const createAdmin = async (req, res) => {
   try {
     const creator = req.admin; // Injected by middleware
-    const { firstName, adminType, supervisorId: requestedSupervisorId, creationReason, email, password, countryCode, localNumber, phone, role } = req.body;
+    const { firstName, adminType, supervisorId: requestedSupervisorId, creationReason, reasonDescription, email, password, countryCode, localNumber, phone, role } = req.body;
 
     // Determine supervisor
     let supervisorId = requestedSupervisorId;
@@ -41,7 +42,7 @@ const createAdmin = async (req, res) => {
     // Call service
     const result = await createAdminService(
       creator,
-      { firstName, adminType, supervisorId, creationReason, email, password, countryCode, localNumber, phone, role },
+      { firstName, adminType, supervisorId, creationReason, reasonDescription, email, password, countryCode, localNumber, phone, role },
       supervisor,
       req.device,
       req.requestId
@@ -55,7 +56,7 @@ const createAdmin = async (req, res) => {
       if (result.type === AdminErrorTypes.INVALID_DATA) {
         return throwBadRequestError(res, result.message);
       }
-      return throwInternalServerError(res, result.message);
+      return throwSpecificInternalServerError(res, result.message);
     }
 
     // Success response

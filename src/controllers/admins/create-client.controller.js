@@ -4,7 +4,8 @@ const {
   throwBadRequestError, 
   throwInternalServerError, 
   getLogIdentifiers, 
-  throwConflictError
+  throwConflictError,
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { createUserSuccessResponse } = require("@responses/success/index");
 const { AdminErrorTypes } = require("@configs/enums.config");
@@ -12,12 +13,14 @@ const { AdminErrorTypes } = require("@configs/enums.config");
 const createClient = async (req, res) => {
   try {
     const creator = req.admin; // Injected by middleware
-    const { firstName, creationReason, email, password, countryCode, localNumber, phone, role } = req.body;
+    const { firstName, creationReason, reasonDescription, email, password, countryCode, localNumber, phone, role, orgIds } = req.body;
+
+    let organizationIds = orgIds || [];
 
     // Call service
     const result = await createClientService(
       creator,
-      { firstName, creationReason, email, password, countryCode, localNumber, phone, role },
+      { firstName, creationReason, reasonDescription, email, password, countryCode, localNumber, phone, role, orgIds: organizationIds },
       req.device,
       req.requestId
     );
@@ -30,7 +33,7 @@ const createClient = async (req, res) => {
       if (result.type === AdminErrorTypes.INVALID_DATA) {
         return throwBadRequestError(res, result.message);
       }
-      return throwInternalServerError(res, result.message);
+      return throwSpecificInternalServerError(res, result.message);
     }
 
     // Success response

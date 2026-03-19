@@ -4,7 +4,8 @@ const {
   throwBadRequestError, 
   throwInternalServerError, 
   getLogIdentifiers, 
-  throwConflictError
+  throwConflictError,
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { convertUserToClientSuccessResponse } = require("@responses/success/index");
 const { AdminErrorTypes } = require("@configs/enums.config");
@@ -12,14 +13,14 @@ const { AdminErrorTypes } = require("@configs/enums.config");
 const convertUserToClient = async (req, res) => {
   try {
     const creator = req.admin; // Injected by middleware
-    const { convertReason, role } = req.body;
+    const { convertReason, reasonDescription, role, organizationIds } = req.body;
 
-    const userId = req.foundUser.userId; // Injected by checkUserMiddleware
+    const user = req.foundUser; // Injected by checkUserMiddleware
 
     // Call service
     const result = await convertUserToClientService(
       creator,
-      { userId, convertReason, role },
+      { user, convertReason, reasonDescription, role, organizationIds },
       req.device,
       req.requestId
     );
@@ -32,7 +33,7 @@ const convertUserToClient = async (req, res) => {
       if (result.type === AdminErrorTypes.INVALID_DATA) {
         return throwBadRequestError(res, result.message);
       }
-      return throwInternalServerError(res, result.message);
+      return throwSpecificInternalServerError(res, result.message);
     }
 
     // Success response
