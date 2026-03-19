@@ -23,7 +23,11 @@ module.exports = {
         CREATE_SUPER_ADMIN: `/create-super-admin`, // /admin-panel-service/api/v1/internal/create-super-admin
         PROVIDE_HEALTH_CHECK_TO_AUTH_SERVICE: `/auth/health`, // /admin-panel-service/api/v1/internal/auth/health
         PROVIDE_HEALTH_CHECK_TO_SOFTWARE_SERVICE: `/software-management/health`, // /admin-panel-service/api/v1/internal/software/health
-        CREATE_USER: `/create-user` // /admin-panel-service/api/v1/internal/create-user
+        CREATE_USER: `/create-user`, // /admin-panel-service/api/v1/internal/create-user
+        BLOCK_USER: `/block-user`, // /admin-panel-service/api/v1/internal/block-user
+        UNBLOCK_USER: `/unblock-user`, // /admin-panel-service/api/v1/internal/unblock-user
+        BLOCK_DEVICE: `/block-device`, // /admin-panel-service/api/v1/internal/block-device
+        UNBLOCK_DEVICE: `/unblock-device` // /admin-panel-service/api/v1/internal/unblock-device
     },
     ADMIN_ROUTES: {
         CREATE_ADMIN: `/create-admin`, // /admin-panel-service/api/v1/admins/create-admin

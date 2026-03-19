@@ -42,6 +42,22 @@ const AUTH_SERVICE_URIS = {
     CONVERT_USER_TO_CLIENT: {
         method: requestMethod.PATCH,
         uri: "/custom-auth-service/api/v1/internal/convert-user-type/{userId}"
+    },
+    BLOCK_USER: {
+        method: requestMethod.PATCH,
+        uri: "/custom-auth-service/api/v1/internal/block-user"
+    },
+    UNBLOCK_USER: {
+        method: requestMethod.PATCH,
+        uri: "/custom-auth-service/api/v1/internal/unblock-user"
+    },
+    BLOCK_DEVICE: {
+        method: requestMethod.PATCH,
+        uri: "/custom-auth-service/api/v1/internal/block-device"
+    },
+    UNBLOCK_DEVICE: {
+        method: requestMethod.PATCH,
+        uri: "/custom-auth-service/api/v1/internal/unblock-device"
     }
 };
 

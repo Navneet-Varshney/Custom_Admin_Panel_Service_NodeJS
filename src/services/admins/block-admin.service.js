@@ -6,6 +6,10 @@ const { AdminErrorTypes, AdminTypes } = require("@configs/enums.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { prepareAuditData, cloneForAudit } = require("@/utils/audit-data.util");
 const { errorMessage } = require("@/utils/log-error.util");
+const { createInternalServiceClient } = require("@/utils/internal-service-client.util");
+const { getServiceToken } = require("@/internals/service-token");
+const { AUTH_SERVICE_URIS } = require("@/configs/internal-uri.config");
+const { INTERNAL_API, SERVICE_NAMES } = require("@/internals/constants");
 
 /**
  * Block Admin Service
@@ -24,6 +28,38 @@ const { errorMessage } = require("@/utils/log-error.util");
 const blockAdminService = async (updaterAdmin, targetAdmin, blockReason, reasonDescription = null, device, requestId) => {
     try {
         const adminId = targetAdmin.adminId;
+        // Call Custom Auth Service's internal block-user API
+        logWithTime(`🔄 Calling Custom Auth Service to block user...`);
+        const serviceToken = await getServiceToken(SERVICE_NAMES.ADMIN_PANEL_SERVICE);
+        const authClient = createInternalServiceClient(
+            INTERNAL_API.CUSTOM_AUTH_SERVICE_URL,
+            serviceToken,
+            SERVICE_NAMES.AUTH_SERVICE,
+            INTERNAL_API.TIMEOUT,
+            INTERNAL_API.RETRY_ATTEMPTS,
+            INTERNAL_API.RETRY_DELAY
+        );
+
+        const authResult = await authClient.callService({
+            method: AUTH_SERVICE_URIS.BLOCK_USER.method,
+            uri: AUTH_SERVICE_URIS.BLOCK_USER.uri,
+            body: {
+                userId: targetAdmin.adminId,
+                adminId: updaterAdmin.adminId
+            }
+        });
+
+        if (!authResult.success) {
+            logWithTime(`❌ Custom Auth Service failed to block user: ${authResult.error}`);
+            return {
+                success: false,
+                type: AdminErrorTypes.INVALID_DATA,
+                message: authResult.error || "Failed to block user in Custom Auth Service"
+            };
+        }
+
+        logWithTime(`✅ User blocked in Custom Auth Service: ${targetAdmin.adminId}`);
+
         logWithTime(`🔄 Blocking admin: ${adminId}...`);
 
         // Prevent blocking SUPER_ADMIN

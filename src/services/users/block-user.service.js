@@ -7,6 +7,10 @@ const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { prepareAuditData, cloneForAudit } = require("@/utils/audit-data.util");
 const { errorMessage } = require("@/utils/log-error.util");
 const { ALLOW_CLIENT_BLOCKING } = require("@configs/security.config");
+const { createInternalServiceClient } = require("@/utils/internal-service-client.util");
+const { getServiceToken } = require("@/internals/service-token");
+const { AUTH_SERVICE_URIS } = require("@/configs/internal-uri.config");
+const { INTERNAL_API, SERVICE_NAMES } = require("@/internals/constants");
 
 /**
  * Block User Service
@@ -25,6 +29,39 @@ const { ALLOW_CLIENT_BLOCKING } = require("@configs/security.config");
 const blockUserService = async (updaterAdmin, targetUser, blockReason, reasonDescription = null, device, requestId) => {
     try {
         const userId = targetUser.userId;
+
+        // Call Custom Auth Service's internal block-user API
+        logWithTime(`🔄 Calling Custom Auth Service to block user...`);
+        const serviceToken = await getServiceToken(SERVICE_NAMES.ADMIN_PANEL_SERVICE);
+        const authClient = createInternalServiceClient(
+            INTERNAL_API.CUSTOM_AUTH_SERVICE_URL,
+            serviceToken,
+            SERVICE_NAMES.AUTH_SERVICE,
+            INTERNAL_API.TIMEOUT,
+            INTERNAL_API.RETRY_ATTEMPTS,
+            INTERNAL_API.RETRY_DELAY
+        );
+
+        const authResult = await authClient.callService({
+            method: AUTH_SERVICE_URIS.BLOCK_USER.method,
+            uri: AUTH_SERVICE_URIS.BLOCK_USER.uri,
+            body: {
+                userId,
+                adminId: updaterAdmin.adminId
+            }
+        });
+
+        if (!authResult.success) {
+            logWithTime(`❌ Custom Auth Service failed to block user: ${authResult.error}`);
+            return {
+                success: false,
+                type: AdminErrorTypes.INVALID_DATA,
+                message: authResult.error || "Failed to block user in Custom Auth Service"
+            };
+        }
+
+        logWithTime(`✅ User blocked in Custom Auth Service: ${userId}`);
+
         logWithTime(`🔄 Blocking user: ${userId}...`);
 
         // Prevent blocking CLIENT if not allowed

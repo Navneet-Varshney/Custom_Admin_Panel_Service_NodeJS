@@ -6,6 +6,10 @@ const { AdminErrorTypes, AdminTypes } = require("@configs/enums.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { prepareAuditData, cloneForAudit } = require("@/utils/audit-data.util");
 const { errorMessage } = require("@/utils/log-error.util");
+const { createInternalServiceClient } = require("@/utils/internal-service-client.util");
+const { getServiceToken } = require("@/internals/service-token");
+const { AUTH_SERVICE_URIS } = require("@/configs/internal-uri.config");
+const { INTERNAL_API, SERVICE_NAMES } = require("@/internals/constants");
 
 /**
  * Unblock Admin Service
@@ -24,6 +28,39 @@ const { errorMessage } = require("@/utils/log-error.util");
 const unblockAdminService = async (updaterAdmin, targetAdmin, unblockReason, reasonDescription = null, device, requestId) => {
     try {
         const adminId = targetAdmin.adminId;
+
+        // Call Custom Auth Service to internal unblock-user API
+        logWithTime(`🔄 Calling Custom Auth Service to unblock user...`);
+        const serviceToken = await getServiceToken(SERVICE_NAMES.ADMIN_PANEL_SERVICE);
+        const authClient = createInternalServiceClient(
+            INTERNAL_API.CUSTOM_AUTH_SERVICE_URL,
+            serviceToken,
+            SERVICE_NAMES.AUTH_SERVICE,
+            INTERNAL_API.TIMEOUT,
+            INTERNAL_API.RETRY_ATTEMPTS,
+            INTERNAL_API.RETRY_DELAY
+        );
+
+        const authResult = await authClient.callService({
+            method: AUTH_SERVICE_URIS.UNBLOCK_USER.method,
+            uri: AUTH_SERVICE_URIS.UNBLOCK_USER.uri,
+            body: {
+                userId: targetAdmin.adminId,
+                adminId: updaterAdmin.adminId
+            }
+        });
+
+        if (!authResult.success) {
+            logWithTime(`❌ Custom Auth Service failed to unblock user: ${authResult.error}`);
+            return {
+                success: false,
+                type: AdminErrorTypes.INVALID_DATA,
+                message: authResult.error || "Failed to unblock user in Custom Auth Service"
+            };
+        }
+
+        logWithTime(`✅ User unblocked in Custom Auth Service: ${targetAdmin.adminId}`);
+
         logWithTime(`🔄 Unblocking admin: ${adminId}...`);
 
         // Prevent unblocking SUPER_ADMIN

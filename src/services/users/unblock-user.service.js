@@ -6,6 +6,10 @@ const { AdminErrorTypes } = require("@configs/enums.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { prepareAuditData, cloneForAudit } = require("@/utils/audit-data.util");
 const { errorMessage } = require("@/utils/log-error.util");
+const { createInternalServiceClient } = require("@/utils/internal-service-client.util");
+const { getServiceToken } = require("@/internals/service-token");
+const { AUTH_SERVICE_URIS } = require("@/configs/internal-uri.config");
+const { INTERNAL_API, SERVICE_NAMES } = require("@/internals/constants");
 
 /**
  * Unblock User Service
@@ -25,6 +29,38 @@ const unblockUserService = async (updaterAdmin, targetUser, unblockReason, reaso
     try {
         const userId = targetUser.userId;
         logWithTime(`🔄 Unblocking user: ${userId}...`);
+
+        // Call Custom Auth Service to internal unblock-user API
+        logWithTime(`🔄 Calling Custom Auth Service to unblock user...`);
+        const serviceToken = await getServiceToken(SERVICE_NAMES.ADMIN_PANEL_SERVICE);
+        const authClient = createInternalServiceClient(
+            INTERNAL_API.CUSTOM_AUTH_SERVICE_URL,
+            serviceToken,
+            SERVICE_NAMES.AUTH_SERVICE,
+            INTERNAL_API.TIMEOUT,
+            INTERNAL_API.RETRY_ATTEMPTS,
+            INTERNAL_API.RETRY_DELAY
+        );
+
+        const authResult = await authClient.callService({
+            method: AUTH_SERVICE_URIS.UNBLOCK_USER.method,
+            uri: AUTH_SERVICE_URIS.UNBLOCK_USER.uri,
+            body: {
+                userId,
+                adminId: updaterAdmin.adminId
+            }
+        });
+
+        if (!authResult.success) {
+            logWithTime(`❌ Custom Auth Service failed to unblock user: ${authResult.error}`);
+            return {
+                success: false,
+                type: AdminErrorTypes.INVALID_DATA,
+                message: authResult.error || "Failed to unblock user in Custom Auth Service"
+            };
+        }
+
+        logWithTime(`✅ User unblocked in Custom Auth Service: ${userId}`);
 
         // Clone old data for audit
         const oldUserClone = cloneForAudit(targetUser);
