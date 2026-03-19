@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { DeviceTypes, AdminTypes, PerformedOnTypes } = require("@configs/enums.config");
+const { DeviceTypes, AdminTypes } = require("@configs/enums.config");
 const { customIdRegex, UUID_V4_REGEX } = require("@configs/regex.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
+const { descriptionLength } = require("@/configs/fields-length.config");
 
 const activityTrackerSchema = new mongoose.Schema({
   adminId: {
@@ -60,19 +61,26 @@ const activityTrackerSchema = new mongoose.Schema({
     type: new mongoose.Schema(
       {
         targetId: {
-          type: String,
+          type: mongoose.Schema.Types.ObjectId,
           default: null,
         },
 
         performedOn: {
           type: String,
-          enum: Object.values(PerformedOnTypes),
+          enum: Object.values(DB_COLLECTIONS),
           default: null,
         },
 
         reason: {
           type: String,
           default: null,
+        },
+
+        reasonDescription: {
+          type: String,
+          default: null,
+          minlength: descriptionLength.min,
+          maxlength: descriptionLength.max,
         },
 
         queryFilter: {

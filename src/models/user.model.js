@@ -59,12 +59,6 @@ const userSchema = new mongoose.Schema({
         enum: Object.values(ClientRevertReasons),
         default: null
     },
-    clientRevertReasonDetails: {
-        type: String,
-        minlength: notesFieldLength.min,
-        maxlength: notesFieldLength.max,
-        default: null
-    },
     clientRevertedBy: {
         type: String,
         default: null,
@@ -77,10 +71,8 @@ const userSchema = new mongoose.Schema({
     isBlocked: { type: Boolean, default: false },
     blockReason: { type: String, enum: Object.values(BlockUserReasons), default: null },
     blockedBy: { type: String, default: null, match: customIdRegex },
-    blockReasonDetails: { type: String, minlength: notesFieldLength.min, maxlength: notesFieldLength.max, default: null },
     blockCount: { type: Number, default: 0 },
     unblockReason: { type: String, enum: Object.values(UnblockUserReasons), default: null },
-    unblockReasonDetails: { type: String, minlength: notesFieldLength.min, maxlength: notesFieldLength.max, default: null },
     unblockedBy: { type: String, default: null, match: customIdRegex },
     blockedAt: { type: Date, default: null },
     unblockedAt: { type: Date, default: null }

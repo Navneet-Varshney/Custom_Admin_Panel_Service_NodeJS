@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { notesFieldLength, deviceNameLength } = require("@configs/fields-length.config");
+const { notesFieldLength } = require("@configs/fields-length.config");
 const { DeviceTypes } = require("@configs/enums.config");
 const { BlockDeviceReasons, UnblockDeviceReasons } = require("@configs/reasons.config");
 const { customIdRegex, UUID_V4_REGEX } = require("@configs/regex.config");
@@ -33,13 +33,6 @@ const deviceSchema = new mongoose.Schema({
         default: null
     },
 
-    blockReasonDetails: {
-        type: String,
-        minlength: notesFieldLength.min,
-        maxlength: notesFieldLength.max,
-        default: null
-    },
-
     blockedBy: {
         type: String,
         match: customIdRegex,
@@ -51,13 +44,6 @@ const deviceSchema = new mongoose.Schema({
     unblockReason: {
         type: String,
         enum: Object.values(UnblockDeviceReasons),
-        default: null
-    },
-
-    unblockReasonDetails: {
-        type: String,
-        minlength: notesFieldLength.min,
-        maxlength: notesFieldLength.max,
         default: null
     },
 
