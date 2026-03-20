@@ -46,8 +46,62 @@ const sendSoftwareServiceHealthSuccess = (res, serviceAuth) => {
     });
 };
 
+/**
+ * Success Response - Delete User
+ * @param {Object} res - Express response object
+ * @param {Object} data - Deleted user/admin data { userId, type }
+ */
+const sendDeleteUserSuccess = (res, data) => {
+    logWithTime("✅ User deleted successfully");
+    return res.status(OK).json({
+        success: true,
+        message: "User deleted successfully",
+        data: {
+            userId: data.userId || data.adminId,
+            type: data.userType || "ADMIN"
+        }
+    });
+};
+
+/**
+ * Success Response - Toggle Active Status
+ * @param {Object} res - Express response object
+ * @param {Object} data - Updated user/admin data { userId, isActive }
+ */
+const sendToggleActiveStatusSuccess = (res, data) => {
+    const action = data.isActive ? "activated" : "deactivated";
+    logWithTime(`✅ User ${action} successfully`);
+    return res.status(OK).json({
+        success: true,
+        message: `User ${action} successfully`,
+        data: {
+            userId: data.userId || data.adminId,
+            isActive: data.isActive
+        }
+    });
+};
+
+const sendUpdatedUserDetailsSuccess = (res, data) => {
+    logWithTime(`✅ User details updated successfully`);
+    return res.status(OK).json({
+        success: true,
+        message: `User details updated successfully`,
+        data: {
+            userId: data.userId || data.adminId,
+            firstName: data.firstName,
+            userType: data.userType
+        }
+    });
+}
+
 module.exports = {
     // Health checks
     sendAuthServiceHealthSuccess,
-    sendSoftwareServiceHealthSuccess
+    sendSoftwareServiceHealthSuccess,
+    // Delete operations
+    sendDeleteUserSuccess,
+    // Status operations
+    sendToggleActiveStatusSuccess,
+    // Update operations
+    sendUpdatedUserDetailsSuccess
 };
