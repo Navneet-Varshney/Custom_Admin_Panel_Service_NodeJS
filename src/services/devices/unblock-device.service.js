@@ -10,6 +10,7 @@ const { createInternalServiceClient } = require("@/utils/internal-service-client
 const { getServiceToken } = require("@/internals/service-token");
 const { AUTH_SERVICE_URIS } = require("@/configs/internal-uri.config");
 const { INTERNAL_API, SERVICE_NAMES } = require("@/internals/constants");
+const { toggleBlockDeviceStatus } = require("@/internals/internal-client/software-management.client");
 
 /**
  * Unblock Device Service
@@ -117,6 +118,9 @@ const unblockDeviceService = async (
     }
 
     logWithTime(`✅ Device unblocked successfully: ${deviceUUID}`);
+
+    // Fire-and-forget: Notify Software Management Service
+    toggleBlockDeviceStatus(deviceUUID, updaterAdmin.adminId, false, requestId);
 
     // Prepare audit
     const { oldData, newData } = prepareAuditData(oldDeviceClone, unblockedDevice);
