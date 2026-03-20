@@ -64,7 +64,12 @@ const organizationUserSchema = new mongoose.Schema({
 // Prevent duplicate user-org mapping
 organizationUserSchema.index(
     { userId: 1, organizationId: 1 },
-    { unique: true }
+    {
+        unique: true,
+        partialFilterExpression: {
+            deletedAt: null
+        }
+    }
 );
 
 /* ---------------- Custom Validations ---------------- */
