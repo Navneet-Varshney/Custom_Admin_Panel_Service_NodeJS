@@ -80,6 +80,10 @@ const SOFTWARE_MANAGEMENT_URIS = {
     TOGGLE_BLOCK_DEVICE_STATUS: {
         method: requestMethod.PATCH,
         uri: "/software-management-service/api/v1/internal/toggle-block-device/:deviceUUID"
+    },
+    UPDATE_ORGANIZATIONS_IN_CLIENT: {
+        method: requestMethod.PATCH,
+        uri: "/software-management-service/api/v1/internal/update-client-organizations/:clientId"
     }
 };
 
