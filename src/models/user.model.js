@@ -69,6 +69,8 @@ const userSchema = new mongoose.Schema({
         default: null
     },
     isBlocked: { type: Boolean, default: false },
+    isActive: { type: Boolean, default: true },
+    isDeleted: { type: Boolean, default: false },
     blockReason: { type: String, enum: Object.values(BlockUserReasons), default: null },
     blockedBy: { type: String, default: null, match: customIdRegex },
     blockCount: { type: Number, default: 0 },

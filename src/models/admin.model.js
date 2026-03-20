@@ -27,6 +27,11 @@ const adminSchema = new mongoose.Schema({
 
     /* ---------------- Activation Lifecycle ---------------- */
 
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+
     isActive: {
         type: Boolean,
         default: true
