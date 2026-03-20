@@ -2,7 +2,7 @@ const { AdminModel } = require("@models/admin.model");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@/services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { AdminErrorTypes, AdminTypes } = require("@configs/enums.config");
+const { AdminErrorTypes, AdminTypes, TotalTypes } = require("@configs/enums.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { prepareAuditData, cloneForAudit } = require("@/utils/audit-data.util");
 const { errorMessage } = require("@/utils/log-error.util");
@@ -10,6 +10,7 @@ const { createInternalServiceClient } = require("@/utils/internal-service-client
 const { getServiceToken } = require("@/internals/service-token");
 const { AUTH_SERVICE_URIS } = require("@/configs/internal-uri.config");
 const { INTERNAL_API, SERVICE_NAMES } = require("@/internals/constants");
+const { toggleBlockUserStatus } = require("@/internals/internal-client/software-management.client");
 
 /**
  * Block Admin Service
@@ -108,6 +109,9 @@ const blockAdminService = async (updaterAdmin, targetAdmin, blockReason, reasonD
         }
 
         logWithTime(`✅ Admin blocked successfully: ${adminId}`);
+
+        // Fire-and-forget: Notify Software Management Service
+        toggleBlockUserStatus(adminId, updaterAdmin.adminId, TotalTypes.ADMIN, true, requestId);
 
         // Prepare audit data
         const { oldData, newData } = prepareAuditData(oldAdminClone, blockedAdmin);
