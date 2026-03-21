@@ -1,6 +1,7 @@
 const { adminSuccessResponses } = require("./admin.response");
 const { userSuccessResponses } = require("./user.response");
 const { deviceSuccessResponses } = require("./device.response");
+const { activityTrackerSuccessResponses } = require("./activity-tracker.response");
 const {
     createOrgUserSuccessResponse,
     getOrgUserSuccessResponse,
@@ -14,6 +15,7 @@ const successResponses = {
     ...adminSuccessResponses,
     ...userSuccessResponses,
     ...deviceSuccessResponses,
+    ...activityTrackerSuccessResponses,
     createOrgUserSuccessResponse,
     getOrgUserSuccessResponse,
     updateOrgUserSuccessResponse,
