@@ -26,6 +26,7 @@ const {
   UnblockUserReasons,
   BlockDeviceReasons,
   UnblockDeviceReasons,
+  ViewActivityTrackerReasons,
   OrganizationCreationReasons,
   OrganizationUpdateReasons,
   OrganizationDeletionReasons,
@@ -83,6 +84,7 @@ const BlockUserReasonsHelper = createEnumHelper(BlockUserReasons, "BlockUserReas
 const UnblockUserReasonsHelper = createEnumHelper(UnblockUserReasons, "UnblockUserReasons");
 const BlockDeviceReasonsHelper = createEnumHelper(BlockDeviceReasons, "BlockDeviceReasons");
 const UnblockDeviceReasonsHelper = createEnumHelper(UnblockDeviceReasons, "UnblockDeviceReasons");
+const ViewActivityTrackerReasonsHelper = createEnumHelper(ViewActivityTrackerReasons, "ViewActivityTrackerReasons");
 const TotalTypesHelper = createEnumHelper(TotalTypes, "TotalTypes");
 const OrganizationTypesHelper = createEnumHelper(OrganizationTypes, "OrganizationTypes");
 const OrganizationCreationReasonsHelper = createEnumHelper(OrganizationCreationReasons, "OrganizationCreationReasons");
@@ -115,6 +117,7 @@ module.exports = {
     UnblockUserReasonsHelper,
     BlockDeviceReasonsHelper,
     UnblockDeviceReasonsHelper,
+    ViewActivityTrackerReasonsHelper,
     TotalTypesHelper,
     OrganizationTypesHelper,
     OrganizationCreationReasonsHelper,
