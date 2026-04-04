@@ -28,5 +28,6 @@ module.exports = {
     listOrgUsersRateLimiter: createRateLimiter(perUserAndDevice.listOrgUsers),
     getAdminActivitiesRateLimiter: createRateLimiter(perUserAndDevice.getAdminActivities),
     listActivitiesRateLimiter: createRateLimiter(perUserAndDevice.listActivities),
-    getMyActivitiesRateLimiter: createRateLimiter(perUserAndDevice.getMyActivities)
+    getMyActivitiesRateLimiter: createRateLimiter(perUserAndDevice.getMyActivities),
+    createClientConversionRequestRateLimiter: createRateLimiter(perUserAndDevice.createClientConversionRequest)
 }

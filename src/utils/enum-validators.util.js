@@ -13,7 +13,8 @@ const {
   AdminRoleTypes,
   ClientRoleTypes,
   TotalTypes,
-  OrganizationTypes
+  OrganizationTypes,
+  ClientConversionRequestTypes
 } = require("@configs/enums.config");
 
 const { 
@@ -36,7 +37,8 @@ const {
   OrganizationalUserUpdateReasons,
   OrganizationalUserDeletionReasons,
   OrganizationalUserDisablitionReasons,
-  OrganizationalUserEnableReasons
+  OrganizationalUserEnableReasons,
+  ClientConversionRequestReasons
  } = require("@configs/reasons.config");
 
 /**
@@ -87,6 +89,7 @@ const UnblockDeviceReasonsHelper = createEnumHelper(UnblockDeviceReasons, "Unblo
 const ViewActivityTrackerReasonsHelper = createEnumHelper(ViewActivityTrackerReasons, "ViewActivityTrackerReasons");
 const TotalTypesHelper = createEnumHelper(TotalTypes, "TotalTypes");
 const OrganizationTypesHelper = createEnumHelper(OrganizationTypes, "OrganizationTypes");
+const ClientConversionRequestTypesHelper = createEnumHelper(ClientConversionRequestTypes, "ClientConversionRequestTypes");
 const OrganizationCreationReasonsHelper = createEnumHelper(OrganizationCreationReasons, "OrganizationCreationReasons");
 const OrganizationUpdateReasonsHelper = createEnumHelper(OrganizationUpdateReasons, "OrganizationUpdateReasons");
 const OrganizationDeletionReasonsHelper = createEnumHelper(OrganizationDeletionReasons, "OrganizationDeletionReasons");
@@ -97,6 +100,7 @@ const OrganizationalUserUpdateReasonsHelper = createEnumHelper(OrganizationalUse
 const OrganizationalUserDeletionReasonsHelper = createEnumHelper(OrganizationalUserDeletionReasons, "OrganizationalUserDeletionReasons");
 const OrganizationalUserDisablitionReasonsHelper = createEnumHelper(OrganizationalUserDisablitionReasons, "OrganizationalUserDisablitionReasons");
 const OrganizationalUserEnableReasonsHelper = createEnumHelper(OrganizationalUserEnableReasons, "OrganizationalUserEnableReasons");
+const ClientConversionRequestReasonsHelper = createEnumHelper(ClientConversionRequestReasons, "ClientConversionRequestReasons");
 
 module.exports = {
     DeviceTypeHelper,
@@ -120,6 +124,7 @@ module.exports = {
     ViewActivityTrackerReasonsHelper,
     TotalTypesHelper,
     OrganizationTypesHelper,
+    ClientConversionRequestTypesHelper,
     OrganizationCreationReasonsHelper,
     OrganizationUpdateReasonsHelper,
     OrganizationDeletionReasonsHelper,
@@ -129,5 +134,6 @@ module.exports = {
     OrganizationalUserUpdateReasonsHelper,
     OrganizationalUserDeletionReasonsHelper,
     OrganizationalUserDisablitionReasonsHelper,
-    OrganizationalUserEnableReasonsHelper
+    OrganizationalUserEnableReasonsHelper,
+    ClientConversionRequestReasonsHelper
 };
